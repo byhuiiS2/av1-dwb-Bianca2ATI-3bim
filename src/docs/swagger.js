@@ -4,14 +4,16 @@ const swaggerDocument = {
   openapi: "3.0.0",
   info: {
     title: "API Hello Kitty",
-    description: "API REST para cadastro e gerenciamento de personagens da Hello Kitty",
-    version: "1.0.0"
+    version: "1.0.0",
+    description: "API REST para gerenciamento de personagens da Hello Kitty"
   },
+
   servers: [
     {
       url: "http://localhost:3000"
     }
   ],
+
   components: {
     securitySchemes: {
       bearerAuth: {
@@ -20,6 +22,7 @@ const swaggerDocument = {
         bearerFormat: "Token"
       }
     },
+
     schemas: {
       Personagem: {
         type: "object",
@@ -46,6 +49,7 @@ const swaggerDocument = {
           }
         }
       },
+
       Usuario: {
         type: "object",
         properties: {
@@ -65,10 +69,11 @@ const swaggerDocument = {
       }
     }
   },
+
   paths: {
     "/": {
       get: {
-        summary: "Verifica se a API está funcionando",
+        summary: "Verificar se a API está funcionando",
         responses: {
           "200": {
             description: "API funcionando"
@@ -76,9 +81,10 @@ const swaggerDocument = {
         }
       }
     },
+
     "/usuarios": {
       post: {
-        summary: "Cadastra um novo usuário",
+        summary: "Cadastrar usuário",
         requestBody: {
           required: true,
           content: {
@@ -102,9 +108,10 @@ const swaggerDocument = {
         }
       }
     },
+
     "/login": {
       post: {
-        summary: "Realiza o login do usuário",
+        summary: "Realizar login",
         requestBody: {
           required: true,
           content: {
@@ -120,11 +127,7 @@ const swaggerDocument = {
                     type: "string",
                     example: "123456"
                   }
-                },
-                required: [
-                  "email",
-                  "senha"
-                ]
+                }
               }
             }
           }
@@ -139,9 +142,10 @@ const swaggerDocument = {
         }
       }
     },
+
     "/personagens": {
       get: {
-        summary: "Lista todos os personagens",
+        summary: "Listar personagens",
         security: [
           {
             bearerAuth: []
@@ -149,15 +153,26 @@ const swaggerDocument = {
         ],
         responses: {
           "200": {
-            description: "Lista de personagens"
+            description: "Lista de personagens",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "array",
+                  items: {
+                    $ref: "#/components/schemas/Personagem"
+                  }
+                }
+              }
+            }
           },
           "401": {
             description: "Token inválido ou não informado"
           }
         }
       },
+
       post: {
-        summary: "Cadastra um novo personagem",
+        summary: "Cadastrar personagem",
         security: [
           {
             bearerAuth: []
@@ -178,7 +193,7 @@ const swaggerDocument = {
             description: "Personagem cadastrado com sucesso"
           },
           "400": {
-            description: "Dados obrigatórios não informados"
+            description: "Todos os campos são obrigatórios"
           },
           "401": {
             description: "Token inválido ou não informado"
@@ -186,9 +201,10 @@ const swaggerDocument = {
         }
       }
     },
+
     "/personagens/{id}": {
       get: {
-        summary: "Busca um personagem pelo ID",
+        summary: "Buscar personagem por ID",
         security: [
           {
             bearerAuth: []
@@ -201,7 +217,8 @@ const swaggerDocument = {
             required: true,
             schema: {
               type: "integer"
-            }
+            },
+            example: 1
           }
         ],
         responses: {
@@ -216,8 +233,9 @@ const swaggerDocument = {
           }
         }
       },
+
       put: {
-        summary: "Atualiza um personagem",
+        summary: "Atualizar personagem",
         security: [
           {
             bearerAuth: []
@@ -230,7 +248,8 @@ const swaggerDocument = {
             required: true,
             schema: {
               type: "integer"
-            }
+            },
+            example: 1
           }
         ],
         requestBody: {
@@ -238,7 +257,25 @@ const swaggerDocument = {
           content: {
             "application/json": {
               schema: {
-                $ref: "#/components/schemas/Personagem"
+                type: "object",
+                properties: {
+                  nome: {
+                    type: "string",
+                    example: "Hello Kitty"
+                  },
+                  especie: {
+                    type: "string",
+                    example: "Gata"
+                  },
+                  personalidade: {
+                    type: "string",
+                    example: "Muito amigável"
+                  },
+                  cor: {
+                    type: "string",
+                    example: "Branco"
+                  }
+                }
               }
             }
           }
@@ -249,11 +286,15 @@ const swaggerDocument = {
           },
           "404": {
             description: "Personagem não encontrado"
+          },
+          "401": {
+            description: "Token inválido ou não informado"
           }
         }
       },
+
       delete: {
-        summary: "Exclui um personagem",
+        summary: "Excluir personagem",
         security: [
           {
             bearerAuth: []
@@ -266,7 +307,8 @@ const swaggerDocument = {
             required: true,
             schema: {
               type: "integer"
-            }
+            },
+            example: 1
           }
         ],
         responses: {
@@ -275,13 +317,18 @@ const swaggerDocument = {
           },
           "404": {
             description: "Personagem não encontrado"
+          },
+          "401": {
+            description: "Token inválido ou não informado"
           }
         }
       }
     },
+
     "/upload": {
       post: {
-        summary: "Envia uma imagem",
+        summary: "Enviar imagem",
+        description: "Aceita imagens JPG, JPEG ou PNG de até 2 MB.",
         security: [
           {
             bearerAuth: []
@@ -294,21 +341,25 @@ const swaggerDocument = {
               schema: {
                 type: "object",
                 properties: {
-                  imagem: {
+                  arquivo: {
                     type: "string",
-                    format: "binary"
+                    format: "binary",
+                    description: "Imagem JPG, JPEG ou PNG de até 2 MB"
                   }
-                }
+                },
+                required: [
+                  "arquivo"
+                ]
               }
             }
           }
         },
         responses: {
           "201": {
-            description: "Imagem enviada com sucesso"
+            description: "Arquivo enviado com sucesso"
           },
           "400": {
-            description: "Imagem não enviada"
+            description: "Arquivo não enviado"
           },
           "401": {
             description: "Token inválido ou não informado"
