@@ -25,6 +25,16 @@ app.post("/login", fazerLogin);
 
 app.use("/upload", uploadRoutes);
 
+try {
+
+await prisma.$connect();
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
+} catch (error) {
+  console.error("Erro ao conectar ao banco de dados:", error);
+
+  await prisma.$disconnect();
+
+  process.exitCode = -1;
+}
